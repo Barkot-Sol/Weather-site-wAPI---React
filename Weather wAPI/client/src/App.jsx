@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { DateDisplay } from './components/DateDisplay';
 import { SearchBar } from './components/SearchBar';
 import { WeatherCard } from './components/WeatherCard';
+import { HourlyForecastGraph } from './components/HourlyForecastGraph';
+import { WeeklyForecastTable } from './components/WeeklyForecastTable';
 import { PopularCities } from './components/PopularCities';
 
 export default function App() {
@@ -40,6 +42,56 @@ export default function App() {
     }
   }, []);
 
+  // Fetch weather by geographic coordinates
+  const fetchWeatherByCoords = useCallback(async (lat, lon) => {
+    setLoadingWeather(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`/api/weather?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to fetch weather data for your location.');
+      }
+
+      setCurrentWeather(data);
+      if (data.name) {
+        setQuery(data.name);
+      }
+      if (data.bg) {
+        setBgImage(data.bg);
+      }
+    } catch (err) {
+      console.warn('Coordinates weather error, falling back to default:', err);
+      fetchWeather('London');
+    } finally {
+      setLoadingWeather(false);
+    }
+  }, [fetchWeather]);
+
+  // Trigger geolocation detection
+  const handleDetectLocation = useCallback(() => {
+    if (!('geolocation' in navigator)) {
+      setError('Geolocation is not supported by your browser.');
+      return;
+    }
+
+    setLoadingWeather(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        fetchWeatherByCoords(latitude, longitude);
+      },
+      (geoError) => {
+        console.warn('Geolocation error or permission denied:', geoError.message);
+        // If initial or manual, fallback gracefully to London
+        fetchWeather('London');
+      },
+      { timeout: 8000, enableHighAccuracy: false }
+    );
+  }, [fetchWeatherByCoords, fetchWeather]);
+
   // Fetch popular cities on load or manual refresh
   const fetchPopular = useCallback(async () => {
     setLoadingPopular(true);
@@ -59,11 +111,11 @@ export default function App() {
     }
   }, []);
 
+  // Start the site with the location of the user!
   useEffect(() => {
     fetchPopular();
-    // Pre-populate with London for instant wow factor on startup
-    fetchWeather('London');
-  }, [fetchPopular, fetchWeather]);
+    handleDetectLocation();
+  }, [fetchPopular, handleDetectLocation]);
 
   const handleCitySelect = (cityName) => {
     setQuery(cityName);
@@ -124,6 +176,7 @@ export default function App() {
             query={query}
             setQuery={setQuery}
             onSearch={fetchWeather}
+            onLocate={handleDetectLocation}
             loading={loadingWeather}
           />
 
@@ -141,7 +194,25 @@ export default function App() {
           )}
 
           {currentWeather && (
-            <WeatherCard weather={currentWeather} unit={unit} />
+            <>
+              <WeatherCard weather={currentWeather} unit={unit} />
+              
+              {/* 24-Hour Weather Graph */}
+              {currentWeather.forecast24h && currentWeather.forecast24h.length > 0 && (
+                <HourlyForecastGraph
+                  hourlyData={currentWeather.forecast24h}
+                  unit={unit}
+                />
+              )}
+
+              {/* Next Week Weather Table */}
+              {currentWeather.forecastWeek && currentWeather.forecastWeek.length > 0 && (
+                <WeeklyForecastTable
+                  weeklyData={currentWeather.forecastWeek}
+                  unit={unit}
+                />
+              )}
+            </>
           )}
         </section>
 
@@ -164,3 +235,4 @@ export default function App() {
     </div>
   );
 }
+

@@ -1,7 +1,7 @@
 import React from 'react';
-import { SearchIcon, RefreshIcon } from './WeatherIcons';
+import { SearchIcon, RefreshIcon, MapPinIcon } from './WeatherIcons';
 
-export function SearchBar({ query, setQuery, onSearch, loading }) {
+export function SearchBar({ query, setQuery, onSearch, onLocate, loading }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (query.trim()) {
@@ -25,6 +25,18 @@ export function SearchBar({ query, setQuery, onSearch, loading }) {
           disabled={loading}
           autoComplete="off"
         />
+        {onLocate && (
+          <button
+            type="button"
+            className="search-locate-btn"
+            onClick={onLocate}
+            disabled={loading}
+            title="Use current location"
+            aria-label="Use current location"
+          >
+            <MapPinIcon size={18} />
+          </button>
+        )}
       </div>
       <button
         type="submit"
@@ -43,3 +55,4 @@ export function SearchBar({ query, setQuery, onSearch, loading }) {
     </form>
   );
 }
+

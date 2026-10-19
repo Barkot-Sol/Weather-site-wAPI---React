@@ -125,11 +125,63 @@ export function ThermometerIcon({ size = 20, className = '' }) {
   );
 }
 
+export function CloudSunIcon({ size = 24, className = '' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M12 2v2" />
+      <path d="m4.93 4.93 1.41 1.41" />
+      <path d="M20 12h2" />
+      <path d="m19.07 4.93-1.41 1.41" />
+      <path d="M15.947 12.65a4 4 0 0 0-5.925-4.128" />
+      <path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z" />
+    </svg>
+  );
+}
+
+export function FogIcon({ size = 24, className = '' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M4 14h16" />
+      <path d="M4 18h16" />
+      <path d="M7 10h10" />
+      <path d="M9 6h6" />
+    </svg>
+  );
+}
+
+export function HeavyRainIcon({ size = 24, className = '' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
+      <path d="m7 15-2 5" />
+      <path d="m11 15-2 5" />
+      <path d="m15 15-2 5" />
+      <path d="m19 15-2 5" />
+    </svg>
+  );
+}
+
+export function SleetIcon({ size = 24, className = '' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
+      <path d="m8 15-1.5 3" />
+      <path d="M12 16v3" />
+      <circle cx="16" cy="18" r="1" fill="currentColor" />
+    </svg>
+  );
+}
+
 export function getWeatherConditionIcon(condition = '', size = 28) {
   const c = condition.toLowerCase();
-  if (c.includes('thunder')) return <ThunderIcon size={size} />;
+  if (c.includes('thunder') || c.includes('lightning')) return <ThunderIcon size={size} />;
+  if (c.includes('tornado') || c.includes('squall') || c.includes('wind') || c.includes('gale')) return <WindIcon size={size} />;
+  if (c.includes('sleet') || c.includes('ice') || c.includes('hail') || c.includes('freezing')) return <SleetIcon size={size} />;
+  if (c.includes('heavy rain') || c.includes('downpour') || c.includes('torrential') || c.includes('shower')) return <HeavyRainIcon size={size} />;
   if (c.includes('rain') || c.includes('drizzle')) return <RainIcon size={size} />;
-  if (c.includes('snow')) return <SnowIcon size={size} />;
-  if (c.includes('clear')) return <SunIcon size={size} />;
+  if (c.includes('snow') || c.includes('blizzard')) return <SnowIcon size={size} />;
+  if (c.includes('fog') || c.includes('mist') || c.includes('haze') || c.includes('smoke')) return <FogIcon size={size} />;
+  if (c.includes('scattered') || c.includes('few') || c.includes('partly') || c.includes('broken')) return <CloudSunIcon size={size} />;
+  if (c.includes('clear') || c.includes('sun')) return <SunIcon size={size} />;
   return <CloudIcon size={size} />;
 }
