@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -447,6 +448,15 @@ app.get('/api/popular', async (req, res) => {
     console.error('Error fetching popular cities:', error);
     res.status(500).json({ error: 'Failed to fetch popular cities weather.' });
   }
+});
+
+// Serve static frontend assets from client/dist
+const clientDistPath = path.join(__dirname, '../client/dist');
+app.use(express.static(clientDistPath));
+
+// For all non-API GET requests, serve the React app's index.html
+app.get('*', (req, res) => {
+  res.sendFile(path.join(clientDistPath, 'index.html'));
 });
 
 app.listen(PORT, () => {
